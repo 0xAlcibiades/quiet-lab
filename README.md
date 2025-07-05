@@ -85,9 +85,9 @@ quiet-lab implements a sophisticated control system based on first-principles th
 
 The server is modeled as a network of thermal nodes, each representing a component (CPU, DIMM, VRM, etc.). The heat transfer dynamics follow Newton's law of cooling with forced convection:
 
-$
-C \frac{dT}{dt} = Q(t) - H(u) \cdot (T - T_{\text{inlet}}1)
-$
+$$
+C \frac{dT}{dt} = Q(t) - H(u) \cdot (T - T_{\text{inlet}})
+$$
 
 Where:
 - $C = \text{diag}(C_1, ..., C_n) \in \mathbb{R}^{n \times n}$ — Thermal capacitance matrix [J/K]
@@ -99,9 +99,7 @@ Where:
 
 The heat transfer matrix has diagonal structure:
 
-$
-[H(u)]_{ii} = \sum_{j=1}^{m} H_{ij}^{\max} \cdot u_j^{\alpha}
-$
+$$[H(u)]_{ii} = \sum_{j=1}^{m} H_{ij}^{\max} \cdot u_j^{\alpha}$$
 
 where $\alpha \approx 0.8$ captures the turbulent flow regime typical in server cooling.
 
@@ -109,35 +107,29 @@ where $\alpha \approx 0.8$ captures the turbulent flow regime typical in server 
 
 The EKF jointly estimates both system states (temperatures) and parameters (heat transfer coefficients). The augmented state vector is:
 
-$
-\xi = \begin{bmatrix} T \\ \text{vec}(H^{\max}) \end{bmatrix} \in \mathbb{R}^{n + nm}
-$
+$$\xi = \begin{bmatrix} T \\ \text{vec}(H^{\max}) \end{bmatrix} \in \mathbb{R}^{n + nm}$$
 
 **Prediction Step:**
 
-$
-\hat{\xi}_{k|k-1} = f(\xi_{k-1|k-1}, u_k, Q_k)
-$
+$$\hat{\xi}_{k|k-1} = f(\xi_{k-1|k-1}, u_k, Q_k)$$
 
-$
-P_{k|k-1} = F_k P_{k-1|k-1} F_k^{\top} + G_k W G_k^{\top}
-$
+$$P_{k|k-1} = F_k P_{k-1|k-1} F_k^{\top} + G_k W G_k^{\top}$$
 
 where $F_k = \frac{\partial f}{\partial \xi}\Big|_{\xi_{k-1|k-1}}$ is the Jacobian of the state transition.
 
 **Update Step:**
 
-$
+$$
 K_k = P_{k|k-1} C^{\top} (C P_{k|k-1} C^{\top} + R)^{-1}
-$
+$$
 
-$
+$$
 \hat{\xi}_{k|k} = \hat{\xi}_{k|k-1} + K_k(z_k - C\hat{\xi}_{k|k-1})
-$
+$$
 
-$
+$$
 P_{k|k} = (I - K_kC)P_{k|k-1}
-$
+$$
 
 The innovation $\nu_k = z_k - C\hat{\xi}_{k|k-1}$ drives both state correction and parameter learning.
 
@@ -145,9 +137,9 @@ The innovation $\nu_k = z_k - C\hat{\xi}_{k|k-1}$ drives both state correction a
 
 MPC solves a finite-horizon optimal control problem every 15 seconds:
 
-$
+$$
 \min_{U} \sum_{k=0}^{N-1} \ell(x_k, u_k) + \ell_N(x_N)
-$
+$$
 
 where $U = [u_0^{\top}, ..., u_{N-1}^{\top}]^{\top} \in \mathbb{R}^{Nm}$
 
@@ -160,9 +152,9 @@ The stage cost $\ell(x, u)$ balances multiple objectives:
 
 #### Temperature Cost
 
-$
+$$
 \ell_{\text{temp}}(T) = \sum_{i=1}^{n} \phi_i(T_i - T_{i}^{\text{target}})
-$
+$$
 
 where the penalty function is:
 
@@ -192,15 +184,15 @@ $$
 \Lambda = 2^{(\mathcal{L}_{\text{total}} - 40)/10} \quad \text{[sones]}
 $$
 
-$
+$$
 \ell_{\text{acoustic}}(u) = w_{\text{noise}} \cdot (\Lambda - 1)^2
-$
+$$
 
 #### Power Cost
 
-$
+$$
 \ell_{\text{power}}(u) = w_{\text{power}} \sum_{j=1}^{m} u_j^3
-$
+$$
 
 ### 4. Control System Architecture
 
@@ -244,9 +236,7 @@ $
 
 The system exhibits distinct learning phases characterized by the Frobenius norm of the heat transfer matrix updates:
 
-$
-\|\Delta H\|_F = \sqrt{\sum_{i,j} (H_{ij}^{(k)} - H_{ij}^{(k-1)})^2}
-$
+$$\|\Delta H\|_F = \sqrt{\sum_{i,j} \left(H_{ij}^{(k)} - H_{ij}^{(k-1)}\right)^2}$$
 
 **Phase 1: Exploration** (t ∈ [0, 30 min])
 - $\|\Delta H\|_F > 1.0$ — Rapid initial learning
