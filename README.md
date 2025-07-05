@@ -111,27 +111,27 @@ $$\xi = \begin{bmatrix} T \\ \text{vec}(H^{\max}) \end{bmatrix} \in \mathbb{R}^{
 
 **Prediction Step:**
 
-$$\hat{\xi}_{k \mid k-1} = f(\xi_{k-1 \mid k-1}, u_k, Q_k)$$
+$$\hat{\xi}_{k|k-1} = f(\xi_{k-1|k-1}, u_k, Q_k)$$
 
-$$P_{k \mid k-1} = F_k P_{k-1 \mid k-1} F_k^{\top} + G_k W G_k^{\top}$$
+$$P_{k|k-1} = F_k P_{k-1|k-1} F_k^{\top} + G_k W G_k^{\top}$$
 
-where $F_k = \frac{\partial f}{\partial \xi}\Big|_{\xi_{k-1 \mid k-1}}$ is the Jacobian of the state transition.
+where $F_k = \frac{\partial f}{\partial \xi}\Big|_{\xi_{k-1|k-1}}$ is the Jacobian of the state transition.
 
 **Update Step:**
 
 $$
-K_k = P_{k \mid k-1} C^{\top} (C P_{k \mid k-1} C^{\top} + R)^{-1}
+K_k = P_{k|k-1} C^{\top} (C P_{k|k-1} C^{\top} + R)^{-1}
 $$
 
 $$
-\hat{\xi}_{k \mid k} = \hat{\xi}_{k \mid k-1} + K_k(z_k - C\hat{\xi}_{k \mid k-1})
+\hat{\xi}_{k|k} = \hat{\xi}_{k|k-1} + K_k(z_k - C\hat{\xi}_{k|k-1})
 $$
 
 $$
-P_{k \mid k} = (I - K_kC)P_{k \mid k-1}
+P_{k|k} = (I - K_kC)P_{k|k-1}
 $$
 
-The innovation $\nu_k = z_k - C\hat{\xi}_{k \mid k-1}$ drives both state correction and parameter learning.
+The innovation $\nu_k = z_k - C\hat{\xi}_{k|k-1}$ drives both state correction and parameter learning.
 
 ### 3. Model Predictive Control
 
@@ -172,17 +172,11 @@ with urgency scaling: $w_{\text{over}}(i) = w_0 \cdot (1 + 9\sigma_i^3)$ where $
 
 The psychoacoustic model captures human perception of fan noise:
 
-$$
-\mathcal{L}_{\mathrm{fan},j} = \mathcal{L}_{\mathrm{ref}} + 50\log_{10}\left(\frac{\omega_j}{\omega_{\mathrm{ref}}}\right) \quad \text{[dB SPL]}
-$$
+$$\mathcal{L}_{\text{fan},j} = \mathcal{L}_{\text{ref}} + 50\log_{10}\left(\frac{\omega_j}{\omega_{\text{ref}}}\right) \quad \text{[dB SPL]}$$
 
-$$
-\mathcal{L}_{\mathrm{total}} = 10\log_{10}\left(\sum_{j=1}^{m} 10^{\mathcal{L}_{\mathrm{fan},j}/10}\right) \quad \text{[dB SPL]}
-$$
+$$\mathcal{L}_{\text{total}} = 10\log_{10}\left(\sum_{j=1}^{m} 10^{\mathcal{L}_{\text{fan},j}/10}\right) \quad \text{[dB SPL]}$$
 
-$$
-\Lambda = 2^{(\mathcal{L}_{\mathrm{total}} - 40)/10} \quad \text{[sones]}
-$$
+$$\Lambda = 2^{(\mathcal{L}_{\text{total}} - 40)/10} \quad \text{[sones]}$$
 
 $$
 \ell_{\text{acoustic}}(u) = w_{\text{noise}} \cdot (\Lambda - 1)^2
@@ -236,7 +230,7 @@ $$
 
 The system exhibits distinct learning phases characterized by the Frobenius norm of the heat transfer matrix updates:
 
-$$\|\Delta H\|_F = \sqrt{\sum_{i,j} \left( H^k_{ij} - H^{k-1}_{ij} \right)^2}$$
+$$\lVert \Delta H \rVert_F = \sqrt{\sum_{i,j} \left( H^k_{ij} - H^{k-1}_{ij} \right)^2}$$
 
 **Phase 1: Exploration** (t ∈ [0, 30 min])
 - $\|\Delta H\|_F > 1.0$ — Rapid initial learning
