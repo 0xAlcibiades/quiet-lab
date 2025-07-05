@@ -1,0 +1,47 @@
+[Unit]
+Description=Adaptive Supermicro ARS210M Fan Control with Learning
+After=network.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+
+# Pre-start: Set fans to FULL speed for safety
+ExecStartPre=/usr/bin/ipmitool raw 0x30 0x45 0x01 0x01
+# Give fans time to spin up
+ExecStartPre=/bin/sleep 2
+
+# Main service
+ExecStart=/usr/bin/python3 /usr/local/bin/fan-control.py
+
+# Normal stop: Return to OPTIMAL mode
+ExecStop=/usr/bin/ipmitool raw 0x30 0x45 0x01 0x02
+
+# Post-stop: Ensure fans are in safe mode (OPTIMAL) even after crashes
+# This runs whether the service stops normally or crashes
+ExecStopPost=/usr/bin/ipmitool raw 0x30 0x45 0x01 0x02
+
+# Restart configuration
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=fan-control
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log /var/lib
+# IPMI requires root access
+User=root
+Group=root
+
+# Resource limits
+CPUQuota=10%
+MemoryLimit=200M
+
+[Install]
+WantedBy=multi-user.target
