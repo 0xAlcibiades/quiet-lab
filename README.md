@@ -115,7 +115,9 @@ $$\xi_{k|k-1} = f(\xi_{k-1|k-1}, u_k, Q_k)$$
 
 $$P_{k \mid k-1} = F_k P_{k-1 \mid k-1} F_k^{\top} + G_k W G_k^{\top}$$
 
-where $F_k = \frac{\partial f}{\partial \xi}|_{\xi_{k-1|k-1}}$ is the Jacobian of the state transition.
+where the Jacobian of the state transition is:
+
+$$F_k = \frac{\partial f}{\partial \xi}\Big\mid_{\xi_{k-1|k-1}}$$
 
 **Update Step:**
 
